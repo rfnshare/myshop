@@ -1,0 +1,38 @@
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Django migrations
+*/migrations/*
+
+# Database files
+db.sqlite3
+
+# Static files (optional, if you don't want to track them)
+/static/
+
+# Media files (optional, if you don't want to track them)
+/media/
+
+# Virtual environment
+venv/
+.env/
+
+# Django secret key
+.env
+
+# IDE/editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Local configuration
+local_settings.py
+
+# Other
+.DS_Store  # macOS
