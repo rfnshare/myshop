@@ -12,6 +12,7 @@ class RegisterUserView(APIView):
     """
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         serializer = CustomUserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -19,7 +20,10 @@ class RegisterUserView(APIView):
                 "message": "User created successfully",
                 "user": {
                     "username": user.username,
-                    "email": user.email
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "phone_number": user.phone_number,
+                    "profile_pic": user.profile_pic.url if user.profile_pic else None
                 }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -69,10 +73,8 @@ class LogoutUserView(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            print("Authorization Header:", request.headers.get("Authorization"))
             # Get the refresh token from the request
             refresh_token = request.data.get("refresh")
-            print("Refresh Token -->",refresh_token)
             if not refresh_token:
                 return Response({"detail": "Refresh token is required for logout."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -86,13 +88,20 @@ class LogoutUserView(APIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserProfileView(APIView):
-    """
-    Get the profile of the authenticated user.
-    """
-    permission_classes = [IsAuthenticated]
-
     def get(self, request, *args, **kwargs):
         user = request.user
         serializer = UserProfileSerializer(user)
-        return Response(serializer.data, status=200)
+
+        # Check if user has a profile picture and add the URL to the response data
+        if user.profile_pic:
+            # Generate the full URL to the profile picture
+            profile_pic_url = request.build_absolute_uri(user.profile_pic.url)
+            # Add the URL to the serialized data
+            data = serializer.data
+            data['profile_pic_url'] = profile_pic_url
+        else:
+            data = serializer.data
+            data['profile_pic_url'] = None  # If no profile pic, add None
+
+        return Response(data, status=200)
 
