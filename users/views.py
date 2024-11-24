@@ -1,14 +1,17 @@
 from django.contrib.auth import authenticate
-from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import CustomUserRegistrationSerializer, CustomUserLoginSerializer
 
-# User Registration View
-@api_view(['POST'])
-def register_user(request):
-    if request.method == 'POST':
+
+class RegisterUserView(APIView):
+    """
+    Class-based view for user registration.
+    """
+
+    def post(self, request, *args, **kwargs):
         serializer = CustomUserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -21,10 +24,13 @@ def register_user(request):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# User Login View
-@api_view(['POST'])
-def login_user(request):
-    if request.method == 'POST':
+
+class LoginUserView(APIView):
+    """
+    Class-based view for user login.
+    """
+
+    def post(self, request, *args, **kwargs):
         serializer = CustomUserLoginSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
