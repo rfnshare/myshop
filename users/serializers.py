@@ -9,18 +9,27 @@ from users.models import CustomUser
 User = get_user_model()
 
 class CustomUserRegistrationSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=100, required=True)
+    last_name = serializers.CharField(max_length=100, required=True)
+    profile_pic = serializers.ImageField(required=False)
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'password', 'phone_number')
+        fields = ('username', 'email', 'password', 'phone_number', 'first_name', 'last_name', 'profile_pic')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        # Create user using the custom manager's create_user method
+        # Handle password and profile pic separately
         password = validated_data.pop('password', None)
         user = CustomUser.objects.create_user(**validated_data)
         if password:
             user.set_password(password)
             user.save()
+
+        # If a profile pic is provided, save it
+        if 'profile_pic' in validated_data:
+            user.profile_pic = validated_data['profile_pic']
+            user.save()
+
         return user
 
 class CustomUserLoginSerializer(serializers.Serializer):
@@ -30,4 +39,4 @@ class CustomUserLoginSerializer(serializers.Serializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone_number']
+        fields = ['id', 'username', 'email', 'phone_number','first_name', 'last_name', 'profile_pic']
