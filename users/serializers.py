@@ -39,7 +39,7 @@ class CustomUserLoginSerializer(serializers.Serializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone_number','first_name', 'last_name', 'profile_pic']
+        fields = ['id', 'username', 'email', 'phone_number','first_name', 'last_name', 'profile_pic', 'is_staff']
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,3 +55,29 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         if CustomUser.objects.exclude(id=user.id).filter(email=value).exists():
             raise serializers.ValidationError("This email is already in use.")
         return value
+
+class AdminCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'password', 'is_staff']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, data):
+        # Only an admin can create another admin
+        request = self.context.get('request')
+        if not request.user.is_staff:
+            raise serializers.ValidationError("You do not have permission to create an admin user.")
+        return data
+
+    def create(self, validated_data):
+        # Create the user as an admin (is_staff=True)
+        user = CustomUser.objects.create_user(**validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+class CustomerListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'phone_number', 'is_active']
+

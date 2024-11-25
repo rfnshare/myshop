@@ -1,12 +1,16 @@
 from django.contrib import admin
-from .models import Product, Category
+from .models import Category, SubCategory, Product
 
-@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'stock', 'category', 'created_at')
-    list_filter = ('category',)
-    search_fields = ('name',)
+    list_display = ('id', 'name', 'description', 'price', 'stock', 'sub_category', 'created_at')  # updated 'category' to 'sub_category'
+    list_filter = ('sub_category',)  # updated 'category' to 'sub_category'
 
-@admin.register(Category)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'category', 'description', 'created_at')
+
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_at')
+    list_display = ('id', 'name', 'description', 'created_at')
+
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(SubCategory, SubCategoryAdmin)
+admin.site.register(Product, ProductAdmin)

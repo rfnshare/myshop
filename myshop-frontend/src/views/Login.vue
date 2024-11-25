@@ -12,6 +12,7 @@
       </div>
       <button type="submit" class="btn btn-primary">Login</button>
     </form>
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -24,7 +25,8 @@ export default {
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      errorMessage: "",
     };
   },
   methods: {
@@ -44,7 +46,8 @@ export default {
         await this.$router.push('/dashboard');
         console.log("Login successful");
       } catch (error) {
-        console.error("Login failed:", error.response?.data || error.message);
+        console.error("Admin login failed:", error.response?.data || error.message);
+        this.errorMessage = error.response?.data?.message || "Login failed. Please try again.";
       }
 
     }
@@ -103,5 +106,10 @@ button {
 
 button:hover {
   background-color: #c0392b;
+}
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
 }
 </style>
