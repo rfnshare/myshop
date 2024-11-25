@@ -3,33 +3,36 @@
     <!-- Left Section: Product List -->
     <div class="product-list-section">
       <h2>Product List</h2>
-      <table class="product-table">
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Stock</th>
-          <th>Product Image</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td>{{ product.name }}</td>
-          <td>{{ product.description }}</td>
-          <td>{{ product.price }}</td>
-          <td>{{ product.stock }}</td>
-          <td>
-            <img :src="product.image" alt="Product Image" class="product-image"/>
-          </td>
-          <td>
-            <button @click="editProduct(product)" class="edit-btn">Edit</button>
-            <button @click="deleteProduct(product.id)" class="delete-btn">Delete</button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+      <div class="table-container">
+  <table class="table table-bordered table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Product Image</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="product in products" :key="product.id">
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.stock }}</td>
+        <td>
+          <img :src="product.image" alt="Product Image" class="img-fluid product-image" />
+        </td>
+        <td>
+          <button @click="editProduct(product)" class="btn btn-warning btn-sm">Edit</button>
+          <button @click="deleteProduct(product.id)" class="btn btn-danger btn-sm">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
     </div>
 
     <!-- Right Section: Category, SubCategory, Product Form -->
