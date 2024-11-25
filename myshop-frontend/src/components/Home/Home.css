@@ -1,0 +1,30 @@
+.brand-logo {
+  width: 50px;
+}
+.hero-section {
+  background: linear-gradient(to right, #e74c3c, #2c3e50);
+}
+.category-highlights .card {
+  border: none;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+.category-highlights .card:hover {
+  transform: scale(1.05);
+}
+.product-list .accordion-button {
+  font-weight: bold;
+}
+.product-list .card {
+  border: none;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+.product-list .card:hover {
+  transform: scale(1.05);
+}
+.category-image {
+  width: 100%; /* Make the image take up the full width of the container */
+  height: 200px; /* Fixed height for consistency */
+  object-fit: cover; /* Ensures the image covers the area without distortion */
+}
