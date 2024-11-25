@@ -11,25 +11,31 @@
 
       <!-- User Info -->
       <div class="profile-info">
-        <h2>{{ userFirstName || 'First Name not available' }} {{ userLastName || 'Last Name not available' }}</h2>
+        <h2>{{userName}}</h2>
+        <p><strong>Name:</strong>{{ userFirstName || 'First Name not available' }} {{ userLastName || 'Last Name not available' }}</p>
         <p><strong>Email:</strong> {{ userEmail }}</p>
         <p><strong>Phone:</strong> {{ userPhone }}</p>
       </div>
 
-      <!-- Logout Button -->
-      <button @click="logout" class="logout-btn">Logout</button>
+      <div class="profile-actions">
+      <button class="btn btn-update" @click="navigateToUpdateProfile">
+        Update Profile
+      </button>
+      <button @click="logout" class="btn btn-danger">Logout</button>
+    </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import config from "../config/config";  // Import config to access base URL
+import config from "../config/config";
 
 export default {
   name: "Profile",
   data() {
     return {
+      userName: "",
       userFirstName: "",  // First Name fetched from API
       userLastName: "",   // Last Name fetched from API
       userEmail: "",      // Email fetched from API
@@ -42,45 +48,72 @@ export default {
   },
   methods: {
     async fetchProfile() {
-      const accessToken = localStorage.getItem('access_token'); // Get access token
+      const accessToken = localStorage.getItem("access_token");
 
       if (!accessToken) {
-        this.$router.push('/login'); // If no token, redirect to login
+        await this.$router.push("/login");
         return;
       }
 
       try {
         const response = await axios.get(`${config.base_url}/users/profile/`, {
           headers: {
-            Authorization: `Bearer ${accessToken}`,  // Pass the access token in the header
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
-        console.log(response);
+        // Populate the profile data
+        this.userName = response.data.username
+        this.userFirstName =  response.data.first_name
+        this.userLastName =  response.data.last_name
+        this.userEmail = response.data.email;
+        this.userPhone = response.data.phone_number;
 
-        // Populate the data with the response from the API
-        this.userFirstName = response.data.first_name || '';  // Update first name
-        this.userLastName = response.data.last_name || '';    // Update last name
-        this.userEmail = response.data.email || '';           // Update email
-        this.userPhone = response.data.phone_number || '';    // Update phone number
-        this.userProfilePic = response.data.profile_pic_url || ''; // Update profile picture
-
+        // Update profile picture if available (optional)
+        if (response.data.profile_pic_url) {
+          this.userProfilePic = response.data.profile_pic_url;
+        }
       } catch (error) {
-        // Handle error if token is invalid or expired
-        if (error.response?.data?.code === 'token_not_valid') {
-          console.error('Invalid or expired token:', error.response.data.messages[0].message);
-          this.$router.push('/login');  // Redirect to login if the token is invalid
+        if (error.response?.data?.code === "token_not_valid") {
+          console.error("Invalid token:", error.response.data.messages[0].message);
+          await this.$router.push("/login");
         } else {
-          console.error('Error fetching profile:', error.response?.data || error.message);
+          console.error("Error fetching profile:", error.response?.data || error.message);
         }
       }
     },
+    navigateToUpdateProfile() {
+      this.$router.push("/profile/update");
+    },
+    async logout() {
+      const accessToken = localStorage.getItem("access_token");
+      const refreshToken = localStorage.getItem("refresh_token");
 
-    logout() {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      this.$router.push('/login');  // Redirect to login page after logout
-    }
+      if (!accessToken || !refreshToken) {
+        console.error("No tokens found for logout");
+        return;
+      }
+
+      try {
+        await axios.post(
+          `${config.base_url}/users/logout/`,
+          { refresh: refreshToken },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        // Clear tokens and redirect to login
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        await this.$router.push("/login");
+        console.log("Logged out successfully");
+      } catch (error) {
+        console.error("Logout failed:", error.response?.data || error.message);
+      }
+    },
   },
 };
 </script>
@@ -93,7 +126,11 @@ export default {
   height: 100vh;
   background-color: #f4f4f4;  /* Light background color for the page */
 }
-
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 .profile-card {
   background-color: #fff;
   border-radius: 10px;
