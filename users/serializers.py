@@ -40,3 +40,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'phone_number','first_name', 'last_name', 'profile_pic']
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('first_name', 'last_name', 'email', 'phone_number', 'profile_pic')
+        extra_kwargs = {
+            'email': {'required': True},
+        }
+
+    def validate_email(self, value):
+        """Check if the email is unique."""
+        user = self.context['request'].user
+        if CustomUser.objects.exclude(id=user.id).filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
