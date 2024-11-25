@@ -43,39 +43,39 @@
       </div>
     </section>
 
-    <!-- Category Highlights -->
-    <section class="category-highlights py-5">
-      <div class="container">
-        <h2 class="text-center mb-4 text-danger">Explore Our Categories</h2>
-        <div class="row">
-          <div
-            class="col-md-4"
-            v-for="category in categories"
-            :key="category.id"
-          >
-            <div class="card shadow-sm">
-              <img
-                :src="getCategoryImage(category)"
-                alt="Category Image"
-                class="card-img-top"
-              />
-              <div class="card-body">
-                <h5 class="card-title text-danger">{{ category.name }}</h5>
-                <p class="card-text">
-                  Explore the best products in {{ category.name }}.
-                </p>
-                <button
-                  class="btn btn-danger"
-                  @click="toggleCategory(category.id)"
-                >
-                  View Products
-                </button>
-              </div>
-            </div>
+   <!-- Category Highlights -->
+<section class="category-highlights py-5">
+  <div class="container">
+    <h2 class="text-center mb-4 text-danger">Explore Our Categories</h2>
+    <div class="row">
+      <div
+        class="col-md-4"
+        v-for="category in categories"
+        :key="category.id"
+      >
+        <div class="card shadow-sm">
+          <img
+            :src="getCategoryImage(category)"
+            alt="Category Image"
+            class="card-img-top category-image"
+          />
+          <div class="card-body">
+            <h5 class="card-title text-danger">{{ category.name }}</h5>
+            <p class="card-text">
+              Explore the best products in {{ category.name }}.
+            </p>
+            <button
+              class="btn btn-danger"
+              @click="toggleCategory(category.id)"
+            >
+              View Products
+            </button>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
     <!-- Hierarchical Display -->
     <section class="product-list py-5 bg-light" v-if="activeCategory">
@@ -223,5 +223,10 @@ export default {
 }
 .product-list .card:hover {
   transform: scale(1.05);
+}
+.category-image {
+  width: 100%; /* Make the image take up the full width of the container */
+  height: 200px; /* Fixed height for consistency */
+  object-fit: cover; /* Ensures the image covers the area without distortion */
 }
 </style>
