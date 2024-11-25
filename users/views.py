@@ -3,8 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import CustomUser
 from .serializers import CustomUserRegistrationSerializer, CustomUserLoginSerializer, UserProfileSerializer, \
-    UpdateProfileSerializer
+    UpdateProfileSerializer, AdminCreateSerializer, CustomerListSerializer
 
 
 class RegisterUserView(APIView):
@@ -62,7 +64,7 @@ class LoginUserView(APIView):
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -121,5 +123,55 @@ class UpdateProfileView(APIView):
                 'data': serializer.data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminCreateView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        if not request.user.is_staff:
+            return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = AdminCreateSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            admin_user = serializer.save()
+            return Response({
+                "message": "Admin user created successfully.",
+                "admin": {
+                    "username": admin_user.username,
+                    "email": admin_user.email,
+                    "is_staff": admin_user.is_staff,
+                }
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CustomerListView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        if not request.user.is_staff:
+            return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Filter to only customers (is_staff=False)
+        customers = CustomUser.objects.filter(is_staff=False)
+        serializer = CustomerListSerializer(customers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AdminDashboardView(APIView):
+    permission_classes = [IsAuthenticated,IsAdminUser]
+
+    def get(self, request):
+        if not request.user.is_staff:
+            return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+        total_customers = CustomUser.objects.filter(is_staff=False).count()
+        total_admins = CustomUser.objects.filter(is_staff=True).count()
+        active_customers = CustomUser.objects.filter(is_staff=False, is_active=True).count()
+
+        return Response({
+            "total_customers": total_customers,
+            "total_admins": total_admins,
+            "active_customers": active_customers,
+        }, status=status.HTTP_200_OK)
+
 
 

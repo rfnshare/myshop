@@ -1,143 +1,227 @@
 <template>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
   <div class="home-page">
-    <header class="hero">
-      <div class="hero-content">
-        <h1>Welcome to iFutureBD</h1>
-        <p>Your one-stop shop for the latest gadgets and tech.</p>
-        <div class="actions">
-          <router-link to="/register" class="btn btn-primary">Register</router-link>
-          <router-link to="/login" class="btn btn-secondary">Login</router-link>
+    <!-- Header Section -->
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+      <div class="container">
+        <a class="navbar-brand fw-bold text-danger" href="#">
+          <img src="../assets/logo.jpg" alt="iFutureBD" class="brand-logo" />
+          iFutureBD
+        </a>
+        <form class="d-flex mx-auto w-50">
+          <input
+            class="form-control me-2"
+            type="search"
+            placeholder="Search for products, categories..."
+            aria-label="Search"
+          />
+          <button class="btn btn-danger" type="submit">Search</button>
+        </form>
+        <div class="d-flex">
+          <a href="/cart" class="btn btn-outline-danger">
+            <i class="bi bi-cart"></i> Cart
+          </a>
         </div>
       </div>
     </header>
 
-    <!-- Featured Products Section -->
-    <section class="featured-products">
-      <h2>Featured Products</h2>
-      <div class="product-grid">
-        <div class="product-card" v-for="product in products" :key="product.id">
-          <img :src="product.image" :alt="product.name" />
-          <h3>{{ product.name }}</h3>
-          <p>${{ product.price }}</p>
-          <button class="btn btn-secondary">View Details</button>
+    <!-- Main Banner -->
+    <section class="main-banner bg-danger text-white py-5">
+      <div class="container text-center">
+        <h1>Welcome to iFutureBD</h1>
+        <p class="lead">Your one-stop shop for the latest gadgets and tech</p>
+        <a href="/products" class="btn btn-light btn-lg">Shop Now</a>
+        <div class="mt-3">
+          <a href="/register" class="btn btn-outline-light me-2">Register</a>
+          <a href="/login" class="btn btn-outline-light">Login</a>
         </div>
       </div>
     </section>
+
+    <!-- Category Highlights -->
+    <section class="category-highlights py-5">
+      <div class="container">
+        <h2 class="text-center mb-4 text-danger">Explore Our Categories</h2>
+        <div class="row">
+          <div
+            class="col-md-4"
+            v-for="category in categories"
+            :key="category.id"
+          >
+            <div class="card shadow-sm">
+              <img
+                :src="getCategoryImage(category)"
+                alt="Category Image"
+                class="card-img-top"
+              />
+              <div class="card-body">
+                <h5 class="card-title text-danger">{{ category.name }}</h5>
+                <p class="card-text">
+                  Explore the best products in {{ category.name }}.
+                </p>
+                <button
+                  class="btn btn-danger"
+                  @click="toggleCategory(category.id)"
+                >
+                  View Products
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hierarchical Display -->
+    <section class="product-list py-5 bg-light" v-if="activeCategory">
+      <div class="container">
+        <h2 class="text-center mb-4 text-danger">
+          Products in {{ getCategoryName(activeCategory) }}
+        </h2>
+        <div class="accordion" id="subcategoryAccordion">
+          <div
+            class="accordion-item"
+            v-for="subCategory in activeSubCategories"
+            :key="subCategory.id"
+          >
+            <h2 class="accordion-header" :id="'heading-' + subCategory.id">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                :data-bs-target="'#collapse-' + subCategory.id"
+                aria-expanded="true"
+                :aria-controls="'collapse-' + subCategory.id"
+              >
+                {{ subCategory.name }}
+              </button>
+            </h2>
+            <div
+              :id="'collapse-' + subCategory.id"
+              class="accordion-collapse collapse show"
+              :aria-labelledby="'heading-' + subCategory.id"
+            >
+              <div class="accordion-body">
+                <div class="row">
+                  <div
+                    class="col-md-3"
+                    v-for="product in subCategory.products"
+                    :key="product.id"
+                  >
+                    <div class="card shadow-sm">
+                      <img
+                        :src="product.image"
+                        alt="Product Image"
+                        class="card-img-top"
+                      />
+                      <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">${{ product.price }}</p>
+                        <button class="btn btn-outline-danger">
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="bg-dark text-white py-4">
+      <div class="container text-center">
+        <p>&copy; 2024 iFutureBD. All Rights Reserved.</p>
+        <div class="d-flex justify-content-center">
+          <a href="/about" class="text-white mx-2">About</a>
+          <a href="/contact" class="text-white mx-2">Contact</a>
+          <a href="/privacy" class="text-white mx-2">Privacy</a>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
+import config from '../config/config';
 export default {
   name: "Home",
   data() {
     return {
-      products: [
-        { id: 1, name: "Smartphone", price: 699, image: "/images/smartphone.jpg" },
-        { id: 2, name: "Laptop", price: 999, image: "/images/laptop.jpg" },
-        { id: 3, name: "Headphones", price: 199, image: "/images/headphones.jpg" },
-      ],
+      categories: [],
+      activeCategory: null,
+      activeSubCategories: [],
     };
+  },
+  mounted() {
+    this.fetchCategories();
+  },
+  methods: {
+    async fetchCategories() {
+      try {
+        const response = await fetch(
+          `${config.base_url}/products/products/hierarchical/`
+        );
+        const data = await response.json();
+        this.categories = data.categories.filter(
+          (category) =>
+            category.subCategories.length &&
+            category.subCategories.some((sub) => sub.products.length)
+        );
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    },
+    toggleCategory(categoryId) {
+      this.activeCategory = categoryId;
+      const category = this.categories.find(
+        (cat) => cat.id === categoryId
+      );
+      this.activeSubCategories = category ? category.subCategories : [];
+    },
+    getCategoryImage(category) {
+      return category.image;
+    },
+    getCategoryName(categoryId) {
+      const category = this.categories.find((cat) => cat.id === categoryId);
+      return category ? category.name : "";
+    },
   },
 };
 </script>
 
 <style scoped>
-/* General Page Layout */
-.home-page {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  color: #fff;
+.brand-logo {
+  width: 50px;
 }
-
-/* Hero Section */
-.hero {
+.hero-section {
   background: linear-gradient(to right, #e74c3c, #2c3e50);
-  text-align: center;
-  padding: 50px 20px;
-  color: white;
 }
-
-.hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 10px;
-}
-
-.hero p {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-}
-
-.hero .btn {
-  padding: 10px 20px;
-  font-size: 1rem;
-  background-color: white;
-  color: #e74c3c;
+.category-highlights .card {
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease;
 }
-
-.hero .btn:hover {
-  background-color: #c0392b;
-  color: white;
+.category-highlights .card:hover {
+  transform: scale(1.05);
 }
-
-/* Featured Products Section */
-.featured-products {
-  padding: 20px;
-  background: #333;
+.product-list .accordion-button {
+  font-weight: bold;
 }
-
-.featured-products h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 2rem;
-  color: #e74c3c;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.product-card {
-  background: #222;
-  border: 1px solid #444;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.product-card img {
-  max-width: 100%;
-  border-radius: 10px;
-}
-
-.product-card h3 {
-  font-size: 1.2rem;
-  margin: 10px 0;
-  color: #fff;
-}
-
-.product-card p {
-  font-size: 1rem;
-  color: #e74c3c;
-}
-
-.product-card .btn {
-  padding: 5px 10px;
-  font-size: 0.9rem;
-  background-color: #e74c3c;
-  color: white;
+.product-list .card {
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease;
 }
-
-.product-card .btn:hover {
-  background-color: #c0392b;
+.product-list .card:hover {
+  transform: scale(1.05);
 }
 </style>

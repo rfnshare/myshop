@@ -4,6 +4,7 @@ import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import Dashboard from '../views/Dashboard.vue';
 import Profile from '../views/Profile.vue';
+import ProductManagement from '../views/ProductManagement.vue';
 
 const routes = [
     {
@@ -56,7 +57,27 @@ const routes = [
         path: "/profile/update",
         name: "ProfileUpdate",
         component: () => import("@/views/ProfileUpdate.vue"),
+        meta: {title: 'iFutureBD - Profile Update'},
     },
+    {
+        path: "/admin/login",
+        name: "AdminLogin",
+        component: () => import("../views/AdminLogin.vue"),
+        meta: {title: 'iFutureBD - Admin Login'},
+    },
+    {
+        path: "/admin/dashboard",
+        name: "AdminDashboard",
+        component: () => import("../views/AdminDashboard.vue"), // Create this later
+        meta: {title: 'iFutureBD - Admin Dashboard'},
+    },
+    {
+        path: '/admin/product-management',
+        name: 'ProductManagement',
+        component: ProductManagement,
+        meta: {title: 'iFutureBD - Admin Product Management'},
+    },
+
 
 ];
 
