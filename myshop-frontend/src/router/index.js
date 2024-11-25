@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
@@ -10,25 +10,25 @@ const routes = [
         path: '/',
         name: 'Home',
         component: Home,
-        meta: { title: 'iFutureBD - Home' },
+        meta: {title: 'iFutureBD - Home'},
     },
     {
         path: '/login',
         name: 'Login',
         component: Login,
-        meta: { title: 'iFutureBD - Login' },
+        meta: {title: 'iFutureBD - Login'},
     },
     {
         path: '/register',
         name: 'Register',
         component: Register,
-        meta: { title: 'iFutureBD - Register' },
+        meta: {title: 'iFutureBD - Register'},
     },
     {
         path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard,
-        meta: { title: 'iFutureBD - Dashboard' },
+        meta: {title: 'iFutureBD - Dashboard'},
         beforeEnter: (to, from, next) => {
             const accessToken = localStorage.getItem('access_token');
             if (accessToken) {
@@ -42,7 +42,7 @@ const routes = [
         path: '/profile',
         name: 'Profile',
         component: Profile,  // Add Profile route
-        meta: { title: 'iFutureBD - Profile' },
+        meta: {title: 'iFutureBD - Profile'},
         beforeEnter: (to, from, next) => {
             const accessToken = localStorage.getItem('access_token');
             if (accessToken) {
@@ -51,7 +51,13 @@ const routes = [
                 next('/login');
             }
         }
-    }
+    },
+    {
+        path: "/profile/update",
+        name: "ProfileUpdate",
+        component: () => import("@/views/ProfileUpdate.vue"),
+    },
+
 ];
 
 const router = createRouter({
