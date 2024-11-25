@@ -3,7 +3,7 @@
     <div class="profile-card">
       <!-- Profile Picture -->
       <div class="profile-image-container">
-        <img :src="userProfilePic || '@/assets/profile-icon.svg'"
+        <img :src='userProfilePic'
         alt="Profile Picture"
         class="profile-image"
         />
