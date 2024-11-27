@@ -60,12 +60,6 @@ const routes = [
         meta: {title: 'iFutureBD - Profile Update'},
     },
     {
-        path: "/admin/login",
-        name: "AdminLogin",
-        component: () => import("../views/AdminLogin.vue"),
-        meta: {title: 'iFutureBD - Admin Login'},
-    },
-    {
         path: "/admin/dashboard",
         name: "AdminDashboard",
         component: () => import("../views/AdminDashboard.vue"), // Create this later
