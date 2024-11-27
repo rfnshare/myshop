@@ -84,7 +84,7 @@ export default {
 
       if (!accessToken) {
         // If no token is available, redirect to the admin login page
-        this.$router.push("/admin/login");
+        this.$router.push("/login");
         return;
       }
 
@@ -108,7 +108,7 @@ export default {
             "Error validating user role:",
             error.response?.data || error.message
         );
-        this.$router.push("/admin/login"); // Redirect to admin login on error
+        this.$router.push("/login"); // Redirect to admin login on error
       }
     },
     async fetchDashboardStats() {
@@ -157,7 +157,7 @@ export default {
         localStorage.removeItem("refresh_token");
 
         // Redirect to admin login page
-        this.$router.push("/admin/login");
+        this.$router.push("/login");
         console.log("Admin logged out successfully");
       } catch (error) {
         console.error("Admin logout failed:", error.response?.data || error.message);
