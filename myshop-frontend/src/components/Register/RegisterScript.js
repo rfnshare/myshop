@@ -15,6 +15,9 @@ export default {
     };
   },
   methods: {
+    triggerFileUpload() {
+    document.getElementById("profile-pic").click();
+  },
     handleFileUpload(event) {
       this.profilePic = event.target.files[0]; // Save the uploaded file to data
     },
